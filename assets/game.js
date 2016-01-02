@@ -1,22 +1,55 @@
-//Check if rot.js works in this browser
-if(!ROT.isSupported()){
-alert("The rot.js library is not supported by your browser.");
-} else {
-//GAME ON BBY
-//create a display 80 chars wide and 20 chars high
-var display = new ROT.Display({width:80, height:20});
-var container = display.getContainer();
-//add container to our HTML page
-document.body.appendChild(container);
-var foreground, background, colors;
-for (var i = 0; i <15; i++) {
-  //Calcualte the foreground color, getting progressively darker
-  //and the background color getting progressively lighter
-  foreground = ROT.Color.toRGB([255 - (i*20), 255 - (i*20), 255- (i*20)]);
-  background = ROT.Color.toRGB([i*20, i*20, i*20]);
-  //Create color format specifier
-  colors = "%c{" + foreground + "}%b{" + background + "}";
-  //Draw text at col 2, row i
-  display.drawText(2, i, colors + "Shiny, Captain.");
+var Game = {
+  _display: null,
+  _currentScreen: null,
+  init: function() {
+    //Any necessary initialization goes here
+    this._display = new ROT.Display({width: 80, height: 24});
+    //Create helper for binding to events
+    //and making it sent to screen
+    var game = this; //so we dont lose this. wtf
+    var bindEventToScreen = function(event) {
+      window.addEventListener(event, function(e) {
+        //When an event is reveived, send it to the screen if there is one
+        if(game._currentScreen !== null) {
+          //Send the event type & data to screen
+          game._currentScreen.handleInput(event, e);
+        }
+      });
+    }
+    //Bind keyboard events
+    bindEventToScreen('keydown');
+    bindEventToScreen('keyup');
+    bindEventToScreen('keypress');
+  },
+  getDisplay: function() {
+    return this._display;
+  },
+  switchScreen: function(screen) {
+    //If we had a screen before, tell it that we exited
+    if(this._currentScreen !== null) {
+      this._currentScreen.exit();
+    }
+    //Clear display
+    this.getDisplay().clear();
+    //Update our current screen, tell it we entered, and then render it
+    this._currentScreen = screen;
+    if (!this._currentScreen !== null) {
+      this._currentScreen.enter();
+      this._currentScreen.render(this._display);
+    }
+  }
 }
+
+window.onload = function() {
+  //check for rot.js support in this browser
+  if (!ROT.isSupported()) {
+    alert("The rot.js library is not supported by your browser.");
+  } else {
+    //init the game
+    Game.init();
+    //add the container to our html page
+    document.body.appendChild(Game.getDisplay().getContainer());
+    //Load start screen
+    Game.switchScreen(Game.Screen.startScreen);
+  }
 }
