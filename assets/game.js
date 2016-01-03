@@ -1,9 +1,11 @@
 var Game = {
   _display: null,
   _currentScreen: null,
+  _screenWidth: 80,
+  _screenHeight: 24,
   init: function() {
     //Any necessary initialization goes here
-    this._display = new ROT.Display({width: 80, height: 24});
+    this._display = new ROT.Display({width: this._screenWidth, height: this._screenHeight});
     //Create helper for binding to events
     //and making it sent to screen
     var game = this; //so we dont lose this. wtf
@@ -13,16 +15,26 @@ var Game = {
         if(game._currentScreen !== null) {
           //Send the event type & data to screen
           game._currentScreen.handleInput(event, e);
+          //clear screen
+          game._display.clear();
+          //Render screen
+          game._currentScreen.render(game._display);
         }
       });
     }
     //Bind keyboard events
     bindEventToScreen('keydown');
-    bindEventToScreen('keyup');
-    bindEventToScreen('keypress');
+    //bindEventToScreen('keyup');
+    //bindEventToScreen('keypress');
   },
   getDisplay: function() {
     return this._display;
+  },
+  getScreenWidth: function() {
+    return this._screenWidth;
+  },
+  getScreenHeight: function() {
+    return this._screenHeight;
   },
   switchScreen: function(screen) {
     //If we had a screen before, tell it that we exited
