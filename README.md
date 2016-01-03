@@ -1,2 +1,2 @@
 # RLDev
-Repo for .js rouglike development
+Repo for .js roguelike development
