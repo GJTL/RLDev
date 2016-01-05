@@ -15,10 +15,6 @@ var Game = {
         if(game._currentScreen !== null) {
           //Send the event type & data to screen
           game._currentScreen.handleInput(event, e);
-          //clear screen
-          game._display.clear();
-          //Render screen
-          game._currentScreen.render(game._display);
         }
       });
     }
@@ -36,6 +32,12 @@ var Game = {
   getScreenHeight: function() {
     return this._screenHeight;
   },
+  refresh: function()  {
+    //clear screen
+    this._display.clear();
+    //render screen
+    this._currentScreen.render(this._display);
+  },
   switchScreen: function(screen) {
     //If we had a screen before, tell it that we exited
     if(this._currentScreen !== null) {
@@ -47,7 +49,7 @@ var Game = {
     this._currentScreen = screen;
     if (!this._currentScreen !== null) {
       this._currentScreen.enter();
-      this._currentScreen.render(this._display);
+      this.refresh;
     }
   }
 }
@@ -65,3 +67,4 @@ window.onload = function() {
     Game.switchScreen(Game.Screen.startScreen);
   }
 }
+//http://www.codingcookies.com/2013/04/22/building-a-roguelike-in-javascript-part-5a/
